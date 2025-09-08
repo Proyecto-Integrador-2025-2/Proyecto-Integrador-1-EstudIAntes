@@ -97,11 +97,11 @@ Proyecto-Integrador-1-EstudIAntes/
 *  **Schedule management**: add and display classes.
 *  **Available blocks**: register availability.
 *  **Routines**: display occupied schedules.
-* 🖥 **Web interface** powered by Django + Bootstrap.
+*  **Web interface** powered by Django + Bootstrap.
 
 ---
 
-## 👨‍💻 Authors
+## Authors
 
 * Miguel Ángel Correa Piedrahita
 * Valentina Zapata
