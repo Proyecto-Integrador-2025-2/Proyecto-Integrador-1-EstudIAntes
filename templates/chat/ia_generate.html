@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Asistente IA{% endblock %}
+{% block content %}
+<div class="container mt-5" style="max-width:700px;">
+  <h3 class="mb-3">Asistente Inteligente</h3>
+  <form id="iaForm" method="post" action="{% url 'chat:ai_query' %}">
+    {% csrf_token %}
+    <textarea name="prompt" class="form-control mb-3" rows="4" placeholder="Hazle una pregunta a la IA..."></textarea>
+    <button type="submit" class="btn btn-primary w-100">Enviar</button>
+  </form>
+  <div class="mt-4">
+    <h5>Respuesta:</h5>
+    <div id="iaResponse" class="border p-3 rounded bg-light"></div>
+  </div>
+</div>
+
+<script>
+document.getElementById('iaForm').addEventListener('submit', async (e) => {
+  e.preventDefault()
+  const form = e.target
+  const data = new FormData(form)
+  const response = await fetch(form.action || '', {
+    method: 'POST',
+    body: data
+  })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ error: 'Unknown error' }))
+    document.getElementById('iaResponse').innerText = err.error || 'Error en la petición'
+    return
+  }
+  const result = await response.json()
+  document.getElementById('iaResponse').innerText = result.response || ''
+})
+</script>
+{% endblock %}

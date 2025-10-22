@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Mi Rutina (editable)</h2>
+
+<table class="table">
+  <thead>
+    <tr><th>Día</th><th>Inicio</th><th>Fin</th><th>Actividad</th><th>Notas</th><th>Fuente</th></tr>
+  </thead>
+  <tbody>
+  {% for r in slots %}
+    <tr>
+      <td>{{ r.day }}</td>
+      <td>{{ r.start|time:"H:i" }}</td>
+      <td>{{ r.end|time:"H:i" }}</td>
+      <td>{{ r.activity }}</td>
+      <td>{{ r.notes }}</td>
+      <td>{{ r.source }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">Aún no tienes rutina. Genera una con la IA.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

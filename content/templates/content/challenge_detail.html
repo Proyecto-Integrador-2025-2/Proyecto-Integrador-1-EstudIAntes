@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ challenge.title }}{% endblock %}
+{% block content %}
+<article class="card">
+  <h1>{{ challenge.title }}</h1>
+  <p class="muted">Publicado {{ challenge.created_at|date:"Y-m-d H:i" }}</p>
+  <div class="prose">{{ challenge.body|linebreaks }}</div>
+</article>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Calendario semanal - EstudIAntes{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h3>Calendario semanal</h3>
+
+  {% if is_empty %}
+    <div class="text-center p-4 muted">
+      <p>Aún no has agregado tus horarios. Ve a la sección Horarios para comenzar.</p>
+      <div class="d-flex justify-content-center gap-2 mt-3">
+        <a href="{% url 'busyschedule:schedule_home' %}" class="btn btn">Gestionar horarios</a>
+        <a href="{% url 'chat:generate' %}" class="btn btn-outline-primary">Pedir rutina IA</a>
+      </div>
+    </div>
+  {% else %}
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center">
+        <thead>
+          <tr>
+            <th>Hora</th>
+            {% for day in days %}
+              <th>{{ day }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {{ rows_html|safe }}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+      <a href="{% url 'busyschedule:schedule_home' %}" class="btn btn">Gestionar horarios</a>
+      <a href="{% url 'routine' %}" class="btn btn-outline-primary">Ver rutina sugerida</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Sugerencia de Rutina (IA)</h2>
+
+<p><strong>Resumen:</strong> {{ suggestion.payload.summary }}</p>
+
+<table class="table">
+  <thead>
+    <tr><th>Día</th><th>Inicio</th><th>Fin</th><th>Actividad</th><th>Notas</th></tr>
+  </thead>
+  <tbody>
+  {% for s in suggestion.payload.suggestions %}
+    <tr>
+      <td>{{ s.day }}</td>
+      <td>{{ s.start }}</td>
+      <td>{{ s.end }}</td>
+      <td>{{ s.activity }}</td>
+      <td>{{ s.notes }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<form method="post" action="{% url 'chat:apply_suggestion' suggestion.id %}">
+  {% csrf_token %}
+  <button class="btn btn-primary" {% if suggestion.applied %}disabled{% endif %}>
+    {% if suggestion.applied %}Aplicada{% else %}Aplicar a mi rutina{% endif %}
+  </button>
+</form>
+{% endblock %}

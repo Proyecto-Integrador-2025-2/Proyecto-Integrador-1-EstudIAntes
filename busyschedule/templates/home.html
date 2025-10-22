@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="row g-3">
-  <!-- mensajes -->
+  <!-- Mensajes de éxito o error -->
   {% if messages %}
     <div class="col-12">
       {% for message in messages %}
@@ -26,8 +26,8 @@
           {{ form_schedule.errors }}
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
-      {% endif %} 
-      <form method="post" class="row g-2 align-items-end">
+      {% endif %}
+      <form method="post" action="{% url 'busyschedule:schedule_home' %}" class="row g-2 align-items-end">
         {% csrf_token %}
         <div class="col-5">
           <label class="form-label">Día</label>
@@ -61,7 +61,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
       {% endif %}
-      <form method="post" class="row g-2 align-items-end">
+      <form method="post" action="{% url 'busyschedule:schedule_home' %}" class="row g-2 align-items-end">
         {% csrf_token %}
         <div class="col-5">
           <label class="form-label">Día</label>
@@ -84,6 +84,21 @@
 
   <!-- Columna derecha: visualizaciones -->
   <div class="col-md-7">
+
+    <!-- 🔹 Acciones de IA (punto E) -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body d-flex flex-wrap gap-2 align-items-center">
+        <h5 class="mb-0 me-2">Asistente IA</h5>
+        <a href="{% url 'chat:generate' %}" class="btn btn-success">
+          Pedir sugerencia de rutina (IA)
+        </a>
+        <a href="{% url 'chat:list_routine_slots' %}" class="btn btn-outline-primary">
+          Ver mi rutina
+        </a>
+      </div>
+    </div>
+    <!-- 🔹 Fin Acciones de IA -->
+
     <!-- Horarios ocupados -->
     <h4 class="mb-3">Horarios ocupados</h4>
     <div class="card shadow-sm mb-4">
@@ -95,18 +110,17 @@
               {{ s.day }}: {{ s.start_time }} - {{ s.end_time }}
             </span>
             <div>
+              <form method="post" action="{% url 'busyschedule:delete_schedule' s.pk %}" class="d-inline"
+                    onsubmit="return confirm('¿Eliminar este horario?');">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-danger" type="submit">Eliminar</button>
+              </form>
               <button class="btn btn-sm btn-success me-2"
                       data-bs-toggle="modal"
                       data-bs-target="#editModal"
-                      data-schedule-id="{{ s.pk }}">
-                Editar
-              </button>
-              <button class="btn btn-sm btn-danger"
-                      data-bs-toggle="modal"
-                      data-bs-target="#deleteModal"
                       data-schedule-id="{{ s.pk }}"
-                      data-schedule-info="{{ s.day }}: {{ s.start_time }} - {{ s.end_time }}">
-                Eliminar
+                      data-edit-url="{% url 'busyschedule:edit_schedule_modal' s.pk %}">
+                Editar
               </button>
             </div>
           </li>
@@ -127,13 +141,11 @@
               {% for b in day_blocks %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <span>{{ b.start_time }} - {{ b.end_time }}</span>
-                  <button class="btn btn-sm btn-danger"
-                          data-bs-toggle="modal"
-                          data-bs-target="#deleteBlockModal"
-                          data-block-id="{{ b.pk }}"
-                          data-block-info="{{ day }}: {{ b.start_time }} - {{ b.end_time }}">
-                    Eliminar
-                  </button>
+                  <form method="post" action="{% url 'busyschedule:delete_block' b.pk %}" class="d-inline"
+                        onsubmit="return confirm('¿Eliminar este bloque disponible?');">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-danger" type="submit">Eliminar</button>
+                  </form>
                 </li>
               {% endfor %}
             </ul>
@@ -145,71 +157,8 @@
     </div>
   </div> <!-- 🔹 Cierre de columna derecha -->
 
-  <!-- Modales -->
-  <!-- Modal eliminar -->
-  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form method="post" id="deleteForm">
-          {% csrf_token %}
-          <div class="modal-header">
-            <h5 class="modal-title" id="deleteModalLabel">Confirmar eliminación</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            <p id="scheduleInfo" class="fw-bold"></p>
-            <p>¿Estás seguro de que deseas eliminar este horario?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal eliminar bloque disponible -->
-  <div class="modal fade" id="deleteBlockModal" tabindex="-1" aria-labelledby="deleteBlockModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form method="post" id="deleteBlockForm">
-          {% csrf_token %}
-          <div class="modal-header">
-            <h5 class="modal-title" id="deleteBlockModalLabel">Confirmar eliminación</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            <p id="blockInfo" class="fw-bold"></p>
-            <p>¿Estás seguro de que deseas eliminar este bloque disponible?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal editar -->
-  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editModalLabel">Editar horario</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body" id="editFormContainer">
-          <!-- formulario -->
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" id="saveEdit">Guardar cambios</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Modales (Edit y Delete) -->
+  <div id="modalContainer"></div>
 </div> <!-- 🔹 Cierre de row -->
 
 <!-- 🔹 Toasts para mensajes AJAX -->
@@ -225,58 +174,70 @@
 
 {% block scripts %}
 <script>
-  // Modal eliminar
-  const deleteModal = document.getElementById('deleteModal')
-  deleteModal.addEventListener('show.bs.modal', function (event) {
-    const button = event.relatedTarget
-    const scheduleId = button.getAttribute('data-schedule-id')
-    const scheduleInfo = button.getAttribute('data-schedule-info')
-    document.getElementById('scheduleInfo').textContent = scheduleInfo
-    document.getElementById('deleteForm').action = `/delete/${scheduleId}/`
+  // Helper para inyectar modal HTML y abrir modal con Bootstrap
+  function openModalFromHtml(html) {
+    const container = document.getElementById('modalContainer')
+    container.innerHTML = html
+    const modalEl = container.querySelector('.modal')
+    const modal = new bootstrap.Modal(modalEl)
+    modal.show()
+    return { modalEl, modal }
+  }
+
+  // Handler dinámico para editar
+  document.querySelectorAll('[data-edit-url]').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault()
+      const url = this.getAttribute('data-edit-url')
+      fetch(url)
+        .then(r => r.json())
+        .then(data => {
+          const { modalEl, modal } = openModalFromHtml(data.html_form)
+          // bind save inside modal
+          const saveBtn = modalEl.querySelector('#saveEdit')
+          if (saveBtn) {
+            saveBtn.addEventListener('click', function () {
+              const form = modalEl.querySelector('#editForm')
+              const fd = new FormData(form)
+              const csrftoken = modalEl.querySelector('[name=csrfmiddlewaretoken]').value
+              fetch(url, { method: 'POST', headers: { 'X-CSRFToken': csrftoken }, body: fd })
+                .then(r => r.json())
+                .then(resp => {
+                  if (resp.success) {
+                    modal.hide()
+                    location.reload()
+                  } else {
+                    // Reemplazar cuerpo con errores
+                    modalEl.querySelector('.modal-body').innerHTML = resp.html_form
+                  }
+                })
+            })
+          }
+        })
+    })
   })
 
-  // Modal eliminar bloque
-  const deleteBlockModal = document.getElementById('deleteBlockModal')
-  deleteBlockModal.addEventListener('show.bs.modal', function (event) {
-    const button = event.relatedTarget
-    const blockId = button.getAttribute('data-block-id')
-    const blockInfo = button.getAttribute('data-block-info')
-    document.getElementById('blockInfo').textContent = blockInfo
-    document.getElementById('deleteBlockForm').action = `/delete-block/${blockId}/`
-  })
-
-  // Modal editar
-  const editModal = document.getElementById('editModal')
-  editModal.addEventListener('show.bs.modal', function (event) {
-    const button = event.relatedTarget
-    const scheduleId = button.getAttribute('data-schedule-id')
-    fetch(`/edit/${scheduleId}/modal/`)
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById('editFormContainer').innerHTML = data.html_form
-        document.getElementById('saveEdit').onclick = function () {
-          const form = document.getElementById('editForm')
-          const formData = new FormData(form)
-          fetch(`/edit/${scheduleId}/modal/`, {
-            method: 'POST',
-            body: formData
+  // Handler dinámico para eliminar (horarios y bloques)
+  document.querySelectorAll('[data-delete-url]').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault()
+      const url = this.getAttribute('data-delete-url')
+      fetch(url)
+        .then(r => r.text())
+        .then(html => {
+          const { modalEl, modal } = openModalFromHtml(html)
+          const form = modalEl.querySelector('form')
+          form.addEventListener('submit', function (ev) {
+            ev.preventDefault()
+            const csrftoken = modalEl.querySelector('[name=csrfmiddlewaretoken]').value
+            fetch(url, { method: 'POST', headers: { 'X-CSRFToken': csrftoken } })
+              .then(r => {
+                modal.hide()
+                location.reload()
+              })
           })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              if (data.message) {
-                document.getElementById('toastBody').innerText = data.message
-                const toastEl = document.getElementById('toastMessage')
-                const toast = new bootstrap.Toast(toastEl)
-                toast.show()
-              }
-              setTimeout(() => location.reload(), 1500)
-            } else {
-              document.getElementById('editFormContainer').innerHTML = data.html_form
-            }
-          })
-        }
-      })
+        })
+    })
   })
 </script>
 {% endblock %}

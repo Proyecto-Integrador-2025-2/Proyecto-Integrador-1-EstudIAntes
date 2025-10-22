@@ -1,0 +1,137 @@
+Claro, Chapi. Aquí te dejo el **prompt completo** para Visual Studio / Copilot que arregla los **últimos problemas** y **optimiza todo** de manera eficiente.
+
+---
+
+## 🔧 PROMPT PARA COPILOT / VISUAL STUDIO CODE (Frontend y Backend)
+
+````
+Eres un asistente experto en Django y frontend. Debes corregir y mejorar los siguientes puntos en el proyecto EstudIAntes:
+
+### 1. **Error de `add_class` no definido**:
+- El filtro `add_class` no está funcionando en `home.html` y arroja un error.
+- Solución:
+  - Crear un filtro personalizado en Django para agregar clases CSS a los formularios (ver ejemplo abajo).
+  - En `home.html`, cargar y usar el filtro personalizado para aplicar clases a los campos del formulario.
+
+**Paso 1: Crear filtro personalizado en `busyschedule/templatetags/custom_filters.py`:**
+
+```python
+from django import template
+
+register = template.Library()
+
+@register.filter(name='add_class')
+def add_class(value, arg):
+    """Agrega una clase CSS a un elemento HTML"""
+    return value.as_widget(attrs={'class': arg})
+````
+
+**Paso 2: En `home.html`, cargar y usar el filtro:**
+
+```django
+{% load custom_filters %}
+{{ form_schedule.day|add_class:"form-control" }}
+```
+
+---
+
+### 2. **Error de `apply_all` no encontrado en `/rutina/`**:
+
+* El error `Reverse for 'apply_all' not found` indica que la URL `apply_all` no está registrada en las rutas de Django.
+* Solución:
+
+  * Crear la vista `apply_all()` en `views.py` para manejar la acción de aplicar todas las sugerencias de la IA.
+  * Asegurarse de que la URL `apply_all` esté definida correctamente en `busyschedule/urls.py`.
+  * Corregir el template `routine.html` para usar la URL correcta.
+
+**Paso 1: Crear la vista `apply_all()` en `views.py`:**
+
+```python
+@login_required
+def apply_all(request):
+    """Aplica todas las sugerencias de la rutina generada por IA."""
+    # Lógica para aplicar sugerencias a los slots de rutina
+    # Ejemplo:
+    # - Obtener las sugerencias de AISuggestion
+    # - Crear RoutineSlot para cada sugerencia
+    return redirect('busyschedule:routine')
+```
+
+**Paso 2: Añadir la URL `apply_all` en `busyschedule/urls.py`:**
+
+```python
+from django.urls import path
+from . import views
+
+app_name = "busyschedule"
+
+urlpatterns = [
+    path('apply_all/', views.apply_all, name='apply_all'),
+    # Otras rutas...
+]
+```
+
+**Paso 3: Corregir el template `routine.html` para usar la URL `apply_all`:**
+
+```django
+<a href="{% url 'busyschedule:apply_all' %}" class="btn btn-success">Aplicar todos</a>
+```
+
+---
+
+### 3. **Mejoras en el diseño de la interfaz (Frontend)**:
+
+El diseño actual necesita un cambio para que sea más moderno y amigable para el usuario. Necesito que realices las siguientes mejoras:
+
+1. **Página de Inicio (`/`)**:
+
+   * Mostrar el calendario vacío si el usuario **no tiene horarios** ni **bloques disponibles**.
+   * Si está vacío, muestra un mensaje: “Aún no has agregado tus horarios. Ve a la sección Horarios para comenzar.”
+   * Los botones deben ser grandes, fáciles de presionar, y con un color atractivo.
+   * Solo mostrar el calendario cuando haya datos, de lo contrario, muestra un mensaje y dos botones de acción: “Gestionar horarios” y “Pedir rutina IA”.
+
+2. **Página de Horarios (`/horarios/`)**:
+
+   * Los formularios deben tener bordes redondeados y colores modernos (usando **Tailwind CSS**).
+   * Los botones de **Eliminar** y **Editar** deben abrir sus respectivos **modales de confirmación** con transiciones suaves.
+   * Los **mensajes de confirmación** deben desaparecer automáticamente después de unos segundos.
+   * Los botones de **Eliminar** y **Editar** ahora deben estar conectados a un **POST real** en lugar de solo la interacción visual.
+
+3. **Página de Rutina (`/rutina/`)**:
+
+   * La rutina generada por IA debe presentarse de forma **limpia y clara**, en un formato de **tarjetas** o tabla.
+   * Asegúrate de que **después de aplicar la IA**, los usuarios puedan ver la rutina completa.
+   * Los botones deben estar correctamente enlazados a la acción: **Ver rutina** y **Aplicar rutina**.
+
+**Utiliza clases de Tailwind CSS** para hacer el diseño más atractivo, por ejemplo:
+
+```html
+<button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Aplicar</button>
+```
+
+---
+
+### 4. **Asegurarse de que el flujo de IA funcione correctamente**:
+
+1. **Generar rutina desde IA**: Cuando el usuario haga clic en "Pedir sugerencia de rutina IA", debería generarse y mostrarse correctamente.
+2. Después de generar la rutina, el **botón "Aplicar"** debe guardar la rutina de la IA y redirigir al usuario a la página de **rutina** (`/rutina/`).
+3. Asegúrate de que en **`chat/views.py`**, el flujo de la IA use `redirect('busyschedule:routine')` cuando se aplique la rutina.
+
+---
+
+### 5. **Revisión y corrección de funcionalidades CRUD**:
+
+1. **Eliminar horarios**: Asegúrate de que el formulario de eliminación se envíe correctamente con el método POST.
+2. **Editar horarios**: Al hacer clic en "Editar", debe abrirse un modal con el formulario de edición y permitir guardar cambios correctamente.
+3. **Eliminar bloques disponibles**: Los botones deben eliminar los bloques correctamente y recargar la página para reflejar los cambios.
+
+---
+
+### CRITERIOS DE ACEPTACIÓN:
+
+* [ ] Los botones de **Eliminar** y **Editar** funcionan correctamente con modales y POST.
+* [ ] La página de **inicio** muestra un calendario vacío si no hay horarios ni bloques.
+* [ ] La página de **horarios** tiene un diseño moderno y los formularios son funcionales.
+* [ ] La página de **rutina** muestra la rutina generada por la IA y permite aplicarla correctamente.
+* [ ] El error de `apply_all` ya no ocurre, y el flujo de IA está redirigiendo correctamente.
+* [ ] El **filtro `add_class`** se corrige y funciona como se espera.

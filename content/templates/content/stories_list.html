@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Historias{% endblock %}
+{% block content %}
+<header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+  <h1>Historias</h1>
+  <form method="get" style="display:flex;gap:8px">
+    <input class="input" name="q" value="{{ q }}" placeholder="Buscar historias..."/>
+    <button class="btn" type="submit">Buscar</button>
+  </form>
+</header>
+
+<div class="tagbar">
+  <a class="tag{% if not tag %} muted{% endif %}" href="?{% if q %}q={{ q|urlencode }}{% endif %}">Todas</a>
+  {% for t in tags %}
+    <a class="tag{% if tag == t.name %} muted{% endif %}" href="?tag={{ t.name|urlencode }}{% if q %}&q={{ q|urlencode }}{% endif %}">{{ t.name }}</a>
+  {% endfor %}
+</div>
+
+<section class="grid grid-3">
+  {% for s in page.object_list %}
+    <article class="card">
+      <h3>{{ s.title }}</h3>
+      <p class="muted">{{ s.teaser }}</p>
+      <div id="story-{{ s.slug }}"></div>
+      <button
+        class="btn-link"
+        hx-get="{% url 'content:story_body_partial' s.slug %}"
+        hx-target="#story-{{ s.slug }}"
+        hx-swap="innerHTML">
+        Leer más
+      </button>
+    </article>
+  {% empty %}
+    <p>No hay historias publicadas.</p>
+  {% endfor %}
+</section>
+
+{% include "partials/pagination.html" with page=page q=q tag=tag %}
+{% endblock %}

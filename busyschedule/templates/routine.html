@@ -4,69 +4,44 @@
 
 {% block content %}
 <h2 class="text-center mb-4">Mi rutina semanal</h2>
-
-<div class="table-responsive">
-  <table class="table table-bordered text-center align-middle">
-    <thead class="table-primary">
-      <tr>
-        <th>Hora</th>
-        {% for day in days %}
-          <th>{{ day }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      {% for hour in hours %}
-      <tr>
-        <td><strong>{{ hour }}:00 - {{ hour|add:"1" }}:00</strong></td>
-
-        {% for day in days %}
-          {% with drawn=False %}
-            {# --- Bloque Ocupado --- #}
-            {% for s in schedules %}
-              {% if s.day == day and s.start_time.hour == hour %}
-                <td class="bg-danger text-white" rowspan="{{ s.rowspan }}">
-                  Ocupado<br>{{ s.subject }}
-                </td>
-                {% with drawn=True %}{% endwith %}
-              {% endif %}
-            {% endfor %}
-
-            {# --- Bloque Disponible --- #}
-            {% if not drawn %}
-              {% for b in blocks %}
-                {% if b.day == day and b.start_time.hour == hour %}
-                  <td class="bg-success text-white" rowspan="{{ b.rowspan }}">
-                    Disponible
-                  </td>
-                  {% with drawn=True %}{% endwith %}
+{% if is_empty %}
+  <div class="text-center muted p-4">
+    <p>Aún no tienes una rutina generada. Pide una sugerencia con la IA.</p>
+    <a href="{% url 'chat:generate' %}" class="btn btn">Pedir rutina IA</a>
+  </div>
+{% else %}
+  <div class="table-responsive">
+    <table class="table table-bordered text-center align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th>Hora</th>
+          {% for day in days %}
+            <th>{{ day }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for hour in hours %}
+        <tr>
+          <td><strong>{{ hour }}:00 - {{ hour|add:"1" }}:00</strong></td>
+          {% for day in days %}
+            {% with slot=None %}
+              {% for rs in routine_slots %}
+                {% if rs.day == day and rs.start.hour == hour %}
+                  {% with slot=rs %}{% endwith %}
                 {% endif %}
               {% endfor %}
-            {% endif %}
-
-            {# --- Celda vacía si no está cubierta por un rowspan --- #}
-            {% if not drawn %}
-              {% with inside=False %}
-                {% for s in schedules %}
-                  {% if s.day == day and s.start_time.hour < hour and s.end_time.hour > hour %}
-                    {% with inside=True %}{% endwith %}
-                  {% endif %}
-                {% endfor %}
-                {% for b in blocks %}
-                  {% if b.day == day and b.start_time.hour < hour and b.end_time.hour > hour %}
-                    {% with inside=True %}{% endwith %}
-                  {% endif %}
-                {% endfor %}
-                {% if not inside %}
-                  <td class="bg-white"></td>
-                {% endif %}
-              {% endwith %}
-            {% endif %}
-          {% endwith %}
+              {% if slot %}
+                <td class="bg-accent text-dark">{{ slot.activity }}</td>
+              {% else %}
+                <td class="bg-white"></td>
+              {% endif %}
+            {% endwith %}
+          {% endfor %}
+        </tr>
         {% endfor %}
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+      </tbody>
+    </table>
+  </div>
+{% endif %}
 {% endblock %}

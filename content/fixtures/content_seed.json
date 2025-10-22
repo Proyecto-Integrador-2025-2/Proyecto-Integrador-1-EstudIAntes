@@ -1,0 +1,67 @@
+[
+  {"model":"content.tag","pk":1,"fields":{"name":"IA"}},
+  {"model":"content.tag","pk":2,"fields":{"name":"Educación"}},
+  {"model":"content.tag","pk":3,"fields":{"name":"Productividad"}},
+
+  {"model":"content.challenge","pk":1,"fields":{
+    "title":"Optimiza tu estudio con IA",
+    "slug":"optimiza-tu-estudio-con-ia",
+    "summary":"Diseña un plan de estudio asistido por IA.",
+    "body":"Define objetivos SMART...\nIntegra prompts reutilizables...\nMide avances semanalmente.",
+    "is_published":true,
+    "created_at":"2025-09-15T12:00:00Z",
+    "updated_at":"2025-09-15T12:00:00Z",
+    "tags":[1,2]
+  }},
+  {"model":"content.challenge","pk":2,"fields":{
+    "title":"Escribe mejor documentación técnica",
+    "slug":"escribe-mejor-documentacion-tecnica",
+    "summary":"Estructura, convenciones y estilo para docs efectivas.",
+    "body":"Usa encabezados claros...\nIncluye ejemplos ejecutables...\nChecklist de revisión antes de publicar.",
+    "is_published":true,
+    "created_at":"2025-09-16T12:00:00Z",
+    "updated_at":"2025-09-16T12:00:00Z",
+    "tags":[2,3]
+  }},
+  {"model":"content.challenge","pk":3,"fields":{
+    "title":"Sprint personal de 3 días",
+    "slug":"sprint-personal-3-dias",
+    "summary":"Define backlog, WIP limitado y demo final.",
+    "body":"Día 1: setup y esqueletos...\nDía 2: features core...\nDía 3: pulido y demo.",
+    "is_published":true,
+    "created_at":"2025-09-17T12:00:00Z",
+    "updated_at":"2025-09-17T12:00:00Z",
+    "tags":[3]
+  }},
+
+  {"model":"content.story","pk":1,"fields":{
+    "title":"Cómo conecté un LLM a mi proyecto Django",
+    "slug":"como-conecte-llm-django",
+    "teaser":"Resumen de arquitectura y tips de producción.",
+    "body":"Primero separé settings por entorno...\nLuego encapsulé el cliente del LLM...\nFinalmente guardé el historial en DB.",
+    "is_published":true,
+    "created_at":"2025-09-18T12:00:00Z",
+    "updated_at":"2025-09-18T12:00:00Z",
+    "tags":[1]
+  }},
+  {"model":"content.story","pk":2,"fields":{
+    "title":"Paginación elegante en Django sin dolores",
+    "slug":"paginacion-elegante-django",
+    "teaser":"Trucos para URLs limpias y rendimiento.",
+    "body":"Usa Paginator y conserva query params...\nEvita traer body pesado...\nCrea un parcial reutilizable.",
+    "is_published":true,
+    "created_at":"2025-09-19T12:00:00Z",
+    "updated_at":"2025-09-19T12:00:00Z",
+    "tags":[3]
+  }},
+  {"model":"content.story","pk":3,"fields":{
+    "title":"HTMX para 'Leer más' sin recargar",
+    "slug":"htmx-leer-mas",
+    "teaser":"Un botón que trae el contenido completo vía AJAX.",
+    "body":"Crea una vista parcial...\nUsa hx-get y hx-target...\nMantén el SEO con página de detalle.",
+    "is_published":true,
+    "created_at":"2025-09-20T12:00:00Z",
+    "updated_at":"2025-09-20T12:00:00Z",
+    "tags":[2]
+  }}
+]

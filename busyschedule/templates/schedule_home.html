@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Horarios · EstudIAntes{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-4">Horarios</h1>
+
+<p class="text-muted mb-6">Registra tus clases y bloques disponibles. Estos se usarán para sugerir tu rutina con IA.</p>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <section class="bg-card border border-border rounded-2xl p-4 shadow-card">
+    <h2 class="font-semibold mb-2">Clases</h2>
+    {% if classes %}
+      <ul class="space-y-2">
+        {% for c in classes %}
+          <li class="flex justify-between items-center bg-black/10 rounded-lg px-3 py-2">
+            <span>{{ c.course_name }} — {{ c.day_of_week }} {{ c.start_time }}–{{ c.end_time }}</span>
+            <a class="underline text-accent hover:text-white" href="{{ c.get_edit_url }}">Editar</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">Aún no tienes clases. Agrega la primera.</p>
+    {% endif %}
+    <div class="mt-3">
+  <a href="{% url 'busyschedule:schedule_home' %}?new=class" class="inline-block bg-accent text-black font-semibold px-4 py-2 rounded-lg">Agregar clase</a>
+    </div>
+  </section>
+
+  <section class="bg-card border border-border rounded-2xl p-4 shadow-card">
+    <h2 class="font-semibold mb-2">Bloques disponibles</h2>
+    {% if blocks %}
+      <ul class="space-y-2">
+        {% for b in blocks %}
+          <li class="flex justify-between items-center bg-black/10 rounded-lg px-3 py-2">
+            <span>{{ b.day_of_week }} {{ b.start_time }}–{{ b.end_time }}</span>
+            <a class="underline text-accent hover:text-white" href="{{ b.get_edit_url }}">Editar</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">No hay bloques disponibles aún.</p>
+    {% endif %}
+    <div class="mt-3">
+  <a href="{% url 'busyschedule:schedule_home' %}?new=block" class="inline-block bg-accent text-black font-semibold px-4 py-2 rounded-lg">Agregar bloque</a>
+    </div>
+  </section>
+</div>
+
+<div class="mt-6 flex flex-wrap gap-3">
+  <a href="/chat/" class="bg-white/10 border border-border rounded-lg px-4 py-2 hover:bg-white/15">Ir al Chat IA</a>
+  <a href="{% url 'chat:list_routine_slots' %}" class="bg-accent text-black font-semibold px-4 py-2 rounded-lg">Ver rutina generada</a>
+</div>
+{% endblock %}

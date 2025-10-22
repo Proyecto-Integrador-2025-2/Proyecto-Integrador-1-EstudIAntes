@@ -1,1 +1,54 @@
-*.pyc
+# --- Archivos y carpetas de Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+pip-wheel-metadata/
+
+# --- Entorno virtual ---
+.venv/
+env/
+venv/
+
+# --- Archivos temporales del editor ---
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# --- Archivos de configuración y logs ---
+*.log
+*.pot
+*.mo
+
+# --- Archivos de entorno y secretos ---
+.env
+*.env
+.env.*
+!*.env.example
+
+# --- Archivos de base de datos locales ---
+db.sqlite3
+*.db
+
+# --- Archivos de migración opcionales ---
+# (Descomenta si prefieres no subir migraciones)
+# */migrations/__pycache__/
+# */migrations/*.py
+
+# --- Archivos estáticos generados ---
+/staticfiles/
+media/
+__pycache__/
+
+# --- Archivos de test o cobertura ---
+.coverage
+htmlcov/
+pytest_cache/
+.cache/
