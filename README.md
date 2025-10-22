@@ -1,105 +1,158 @@
-# EstudIAntes
+# EstudIAntes Project
 
-**EstudIAntes** is a web application developed with **Django** as part of the Integrative Project 2025-2.
-The system allows students to manage their class schedules, available time blocks, and routines in a simple and intuitive way.
-
----
+**EstudIAntes** is a web application developed using **Django** that allows students to manage their academic schedules, create availability blocks, and generate personalized study routines using an AI assistant.
 
 ## Prerequisites
 
-Before running the project, make sure you have installed:
+To run this application, you need to have the following programs installed:
 
-* [Python 3.10+](https://www.python.org/downloads/)
-* [pip](https://pip.pypa.io/en/stable/)
-* [Git](https://git-scm.com/)
-
----
+* **Python 3.8+** (it is recommended to use a virtual environment with `venv`)
+* **Django 5.2.7+**
+* **pip** (Python package manager)
 
 ## Installation
 
-1. Clone the repository:
+### 1. Clone the repository
 
-   ```bash
-   git clone https://github.com/Proyecto-Integrador-2025-2/Proyecto-Integrador-1-EstudIAntes.git
-   cd Proyecto-Integrador-1-EstudIAntes
-   ```
+First, clone the repository from GitHub:
 
-2. Create and activate a virtual environment:
+```bash
+git clone https://github.com/your_username/Proyecto-Integrador-1-EstudIAntes.git
+cd Proyecto-Integrador-1-EstudIAntes
+```
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate     # On Linux/Mac
-   venv\Scripts\activate        # On Windows
-   ```
+### 2. Create a virtual environment (optional, but recommended)
 
-3. Install dependencies:
+If you haven't already created a virtual environment for your project, you can do it using the following commands:
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+* For **Windows**:
 
----
+```bash
+python -m venv .venv
+```
 
-## Running the project
+* For **macOS/Linux**:
 
-1. Run database migrations:
+```bash
+python3 -m venv .venv
+```
 
-   ```bash
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
+### 3. Activate the virtual environment
 
-2. (Optional) Create a superuser to access `/admin`:
+* On **Windows**:
 
-   ```bash
-   python manage.py createsuperuser
-   ```
+```bash
+.venv\Scripts\Activate.ps1
+```
 
-3. Start the development server:
+* On **macOS/Linux**:
 
-   ```bash
-   python manage.py runserver
-   ```
+```bash
+source .venv/bin/activate
+```
 
-4. Open in your browser:
+### 4. Install dependencies
 
-   ```
-   http://localhost:8000/
-   ```
+Install all the necessary dependencies using the `requirements.txt` file:
 
----
+```bash
+pip install -r requirements.txt
+```
 
-## Project structure
+### 5. Create the `.env` file with the required variables
+
+Make sure to have an `.env` file at the root of your project with the following variables (you can get the API Key from OpenAI if you're using that feature):
+
+```env
+SECRET_KEY=your_django_secret_key
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+OPENAI_API_KEY=your_openai_api_key
+```
+
+### 6. Run database migrations
+
+To create the necessary tables in the database, run the migrations:
+
+```bash
+python manage.py migrate
+```
+
+### 7. Create a superuser (optional, for Django admin)
+
+If you want to access the Django admin panel, create a superuser with:
+
+```bash
+python manage.py createsuperuser
+```
+
+Follow the prompts to set a username, email, and password.
+
+### 8. Run the development server
+
+To run the development server, use:
+
+```bash
+python manage.py runserver
+```
+
+You can now access the application in your browser at the URL:
 
 ```
-Proyecto-Integrador-1-EstudIAntes/
-│── manage.py
-│── schedule/                # Main project configuration
-│   ├── settings.py
-│   ├── urls.py
-│   └── ...
-│── busyschedule/            # Core app
-│   ├── models.py            # Models (ClassSchedule, AvailableBlock, etc.)
-│   ├── views.py             # Business logic
-│   ├── forms.py             # Forms for schedules and blocks
+http://127.0.0.1:8000/
+```
+
+### 9. Tests
+
+Make sure all functionalities are correctly implemented:
+
+* Adding schedules and available blocks.
+* Viewing and applying AI-generated routines.
+* Editing and deleting schedules and blocks.
+* Displaying success/error messages.
+
+---
+
+## Project Structure
+
+The project structure follows Django’s standard conventions. Below is a summary of the important files and directories:
+
+```
+/Proyecto-Integrador-1-EstudIAntes
+│
+├── busyschedule/            # Main logic for schedule management
+│   ├── models.py            # Defines models for schedules and blocks
+│   ├── views.py             # Views related to schedules
+│   ├── forms.py             # Forms for creating and editing schedules
+│   ├── urls.py              # Routes related to schedules
 │   ├── templates/           # HTML templates
-│   │   ├── base.html
-│   │   ├── home.html
-│   │   ├── routine.html
-│   │   └── ...
-│── requirements.txt         # Project dependencies
+│   └── templatetags/        # Custom filters (if needed)
+│
+├── chat/                    # AI functionality
+│   ├── views.py             # Views related to AI
+│   ├── services.py          # Logic to interact with OpenAI API
+│   └── templates/           # Templates to interact with AI
+│
+├── content/                 # Content (stories, challenges)
+│   └── templates/           # Templates to display stories and challenges
+│
+├── manage.py                # Django management script
+├── requirements.txt         # Project dependencies
+└── .env                     # Configuration variables (including API keys)
 ```
 
 ---
 
-##  Main features
+## Known Issues
 
-*  **Schedule management**: add and display classes.
-*  **Available blocks**: register availability.
-*  **Routines**: display occupied schedules.
-*  **Web interface** powered by Django + Bootstrap.
+* The design is not fully responsive on mobile devices, but all functionalities are working.
+* Some interactions with the AI may be slow depending on the internet connection.
 
 ---
+
+### Final Note
+
+This is the current state of the project. If more time is given, the goal is to further improve the frontend and perfect some functionalities, but the project is fully functional for submission.
 
 ## Authors
 
