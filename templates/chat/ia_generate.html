@@ -1,35 +1,59 @@
 {% extends "base.html" %}
 {% block title %}Asistente IA{% endblock %}
 {% block content %}
-<div class="container mt-5" style="max-width:700px;">
+<div class="card" style="max-width:700px; margin:auto;">
   <h3 class="mb-3">Asistente Inteligente</h3>
-  <form id="iaForm" method="post" action="{% url 'chat:ai_query' %}">
+
+  <form id="iaForm" method="post">
     {% csrf_token %}
-    <textarea name="prompt" class="form-control mb-3" rows="4" placeholder="Hazle una pregunta a la IA..."></textarea>
-    <button type="submit" class="btn btn-primary w-100">Enviar</button>
+    <textarea name="prompt" id="promptInput" rows="4" placeholder="Hazle una pregunta o di 'agrega gimnasio el martes a las 7:00'..."></textarea>
+
+    <div class="flex gap-2 mt-3">
+      <button type="button" id="askBtn" class="btn w-full">Preguntar a la IA</button>
+      <button type="button" id="routineBtn" class="btn w-full bg-green-600 hover:bg-green-700">Modificar rutina</button>
+    </div>
   </form>
+
   <div class="mt-4">
     <h5>Respuesta:</h5>
-    <div id="iaResponse" class="border p-3 rounded bg-light"></div>
+    <div id="iaResponse" class="card mt-2 whitespace-pre-wrap"></div>
   </div>
 </div>
 
 <script>
-document.getElementById('iaForm').addEventListener('submit', async (e) => {
-  e.preventDefault()
-  const form = e.target
-  const data = new FormData(form)
-  const response = await fetch(form.action || '', {
-    method: 'POST',
-    body: data
-  })
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({ error: 'Unknown error' }))
-    document.getElementById('iaResponse').innerText = err.error || 'Error en la petición'
+async function sendToEndpoint(url) {
+  const prompt = document.getElementById('promptInput').value.trim()
+  if (!prompt) {
+    document.getElementById('iaResponse').innerText = "El mensaje está vacío."
     return
   }
-  const result = await response.json()
-  document.getElementById('iaResponse').innerText = result.response || ''
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': '{{ csrf_token }}',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: new URLSearchParams({ prompt })
+  })
+
+  const data = await response.json().catch(() => ({ error: 'Error desconocido' }))
+
+  if (!response.ok) {
+    document.getElementById('iaResponse').innerText = data.error || "Error al conectar con el servidor."
+  } else {
+    document.getElementById('iaResponse').innerText = data.msg || data.response || data.error || data.text || "Sin respuesta."
+  }
+}
+
+// Botón 1 → IA normal
+document.getElementById('askBtn').addEventListener('click', () => {
+  sendToEndpoint("{% url 'chat:ai_query' %}")
+})
+
+// Botón 2 → IA que modifica la rutina
+document.getElementById('routineBtn').addEventListener('click', () => {
+  sendToEndpoint("{% url 'chat:ai_update_routine' %}")
 })
 </script>
 {% endblock %}

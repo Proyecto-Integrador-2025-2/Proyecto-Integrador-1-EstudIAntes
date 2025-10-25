@@ -140,3 +140,62 @@ def apply_suggestion(request, suggestion_id: int):
 def list_routine_slots(request):
     slots = RoutineSlot.objects.filter(user=request.user).order_by("day", "start")
     return render(request, "chat/routine_slots.html", {"slots": slots})
+
+# ------------------------------
+# Chat inteligente que puede modificar la rutina
+# ------------------------------
+@login_required
+def ai_update_routine(request):
+    """
+    Endpoint que permite que la IA interprete órdenes del usuario como:
+    'Agrega gimnasio los martes de 7:00 a 8:00' o 'Elimina yoga del jueves'.
+    Si detecta una orden de agregar, crea un RoutineSlot.
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+    user_input = request.POST.get("prompt", "").strip()
+    if not user_input:
+        return JsonResponse({"error": "El prompt está vacío."}, status=400)
+
+    system_msg = (
+        "Eres un asistente que ayuda a gestionar rutinas de usuario. "
+        "Cuando el usuario diga 'agrega', 'programa' o 'añade', responde con JSON "
+        "en el formato {\"action\": \"add\", \"day\": \"Martes\", \"start\": \"07:00\", "
+        "\"end\": \"08:00\", \"activity\": \"Gimnasio\"}. "
+        "Si no puedes entender, responde con {\"action\": \"none\"}."
+    )
+
+    resp = get_completion(f"{system_msg}\n\nUsuario: {user_input}")
+
+    if not resp["ok"]:
+        return JsonResponse({"error": resp["error"]}, status=500)
+
+    data = resp["json"] or {}
+
+    if data.get("action") == "add":
+        try:
+            start_t = datetime.strptime(data["start"], "%H:%M").time()
+            end_t = datetime.strptime(data["end"], "%H:%M").time()
+
+            RoutineSlot.objects.create(
+                user=request.user,
+                day=data["day"],
+                start=start_t,
+                end=end_t,
+                activity=data["activity"],
+                notes="Agregado por IA",
+                source="ai",
+            )
+
+            return JsonResponse({"ok": True, "msg": "Actividad agregada a tu rutina."})
+
+        except Exception as e:
+            return JsonResponse({"error": f"No se pudo crear la actividad: {e}"}, status=400)
+
+    else:
+        return JsonResponse({
+            "ok": False,
+            "msg": "No se detectó una orden válida para modificar la rutina.",
+            "response": resp["text"],
+        })

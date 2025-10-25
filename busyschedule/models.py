@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User  # ✅ nuevo
+from django.contrib.auth.models import User  
 
 DAYS = [
     ('Lunes', 'Lunes'),
@@ -35,7 +35,7 @@ class ClassSchedule(models.Model):
         return DAY_ORDER.get(self.day, 99)
 
 class AvailableBlock(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='available_blocks', null=True, blank=True)  # ✅ nuevo
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='available_blocks', null=True, blank=True)  
     day = models.CharField(max_length=10, choices=DAYS)
     start_time = models.TimeField()
     end_time = models.TimeField()

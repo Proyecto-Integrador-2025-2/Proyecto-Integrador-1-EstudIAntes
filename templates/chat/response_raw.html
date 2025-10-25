@@ -1,18 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Respuesta IA · EstudIAntes{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-semibold mb-4">Respuesta de la IA</h1>
-
-<p class="text-muted mb-4">
-  La IA no devolvió un formato estructurado, pero aquí puedes leer su respuesta completa:
-</p>
-
-<div class="bg-card border border-border rounded-2xl p-4 shadow-card whitespace-pre-wrap leading-relaxed">
-  {{ text }}
-</div>
-
-<div class="mt-5 flex gap-3 flex-wrap">
-  <a href="{% url 'chat:home' %}" class="bg-accent text-black font-semibold px-4 py-2 rounded-lg">Volver al chat</a>
-  <a href="{% url 'chat:list_routine_slots' %}" class="border border-border rounded-lg px-4 py-2 hover:bg-white/10">Ver mi rutina</a>
+<div class="card max-w-xl mx-auto">
+  <h1 class="mb-3">Respuesta de la IA</h1>
+  <p class="muted mb-3">La IA no devolvió un formato estructurado, pero aquí puedes leer su respuesta completa:</p>
+  <div class="card whitespace-pre-wrap">{{ text }}</div>
+  <div class="mt-4 flex gap-3 flex-wrap">
+    <a href="{% url 'chat:home' %}" class="btn btn-link">Volver al chat</a>
+    <a href="{% url 'chat:list_routine_slots' %}" class="btn btn-link">Ver mi rutina</a>
+  </div>
 </div>
 {% endblock %}
