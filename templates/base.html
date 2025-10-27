@@ -24,7 +24,7 @@
       line-height: 1.6;
     }
     a { color: var(--accent); text-decoration: none; }
-    a:hover { color: #0d47a1; }
+    a:hover { color:#0d47a1; }
 
     .container { max-width:1080px; margin:0 auto; padding:24px; }
 
@@ -90,7 +90,10 @@
 
       {% if user.is_authenticated %}
         <span style="margin-left:auto;color:var(--muted);">Hola, {{ user.username }}</span>
-        <a href="/accounts/logout/" style="color:var(--accent);margin-left:8px;">Salir</a>
+        <form method="post" action="/accounts/logout/" style="display:inline;margin-left:8px;">
+          {% csrf_token %}
+          <button type="submit" class="btn-link" style="font-weight:600;">Salir</button>
+        </form>
       {% else %}
         <a href="/accounts/login/" style="margin-left:auto;">Ingresar</a>
       {% endif %}
