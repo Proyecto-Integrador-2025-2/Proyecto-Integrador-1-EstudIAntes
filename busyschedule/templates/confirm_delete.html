@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar eliminación{% endblock %}
+
+{% block content %}
+<div class="card p-4">
+  <h4>Confirmar eliminación</h4>
+  {% if schedule %}
+    <p>Vas a eliminar el horario: <strong>{{ schedule.subject }}</strong> ({{ schedule.day }} {{ schedule.start_time }} - {{ schedule.end_time }})</p>
+  {% elif block %}
+    <p>Vas a eliminar el bloque: <strong>{{ block.day }} {{ block.start_time }} - {{ block.end_time }}</strong></p>
+  {% else %}
+    <p>Elemento no especificado.</p>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <a href="{% url 'busyschedule:schedule_home' %}" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+  </form>
+</div>
+{% endblock %}

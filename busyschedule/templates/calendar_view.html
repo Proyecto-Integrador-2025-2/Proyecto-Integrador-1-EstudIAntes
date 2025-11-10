@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Calendario Semanal - EstudIAntes{% endblock %}
+
+{% block content %}
+<div class="section">
+  <h1 class="section-title text-center">Calendario Semanal</h1>
+   <p class="text-muted text-center mb-6">Visualiza tu horario actual</p>
+</div>
+
+{% if is_empty %}
+  <div class="card">
+    <div class="empty-state">
+      <div class="empty-state-icon"></div>
+      <h3 style="font-size: 1.25rem; margin-bottom: 12px;">Tu calendario está vacío</h3>
+      <p class="text-muted mb-4">Comienza agregando tus horarios de clases y bloques disponibles</p>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <a href="{% url 'busyschedule:schedule_home' %}" class="btn">Agregar Horarios</a>
+        <a href="{% url 'chat:generate' %}" class="btn btn-outline">Pedir Rutina IA</a>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="card">
+    <div style="overflow-x: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th style="min-width: 100px;">Hora</th>
+            {% for day in days %}
+              <th style="min-width: 140px;">{{ day }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows_html %}
+            {{ row|safe }}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap gap-3 justify-center mt-4">
+    <a href="{% url 'busyschedule:schedule_home' %}" class="btn">Gestionar Horarios</a>
+    <a href="{% url 'routine' %}" class="btn btn-outline">Ver Rutina Sugerida</a>
+  </div>
+{% endif %}
+{% endblock %}

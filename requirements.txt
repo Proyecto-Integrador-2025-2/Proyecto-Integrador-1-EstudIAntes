@@ -1,0 +1,6 @@
+django
+django-htmx
+python-dotenv
+openai
+gunicorn
+whitenoise

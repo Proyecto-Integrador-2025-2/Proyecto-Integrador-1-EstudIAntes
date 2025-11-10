@@ -1,0 +1,201 @@
+# chat/views.py
+import json
+from datetime import datetime
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .services import get_completion
+from .context_builders import fetch_user_context, build_prompt_for_routine
+from .models import AISuggestion, RoutineSlot
+
+
+# ------------------------------
+# Página principal del módulo Chat
+# ------------------------------
+@login_required
+def chat_home(request):
+    """Pantalla principal del chat con formulario para hablar con la IA."""
+    return render(request, "chat/ia_generate.html")
+
+
+# ------------------------------
+# Endpoint simple de consulta a la IA
+# ------------------------------
+def ai_query(request):
+    """Endpoint POST: recibe 'prompt' y devuelve la respuesta de la IA en JSON."""
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    prompt = request.POST.get("prompt", "").strip()
+    if not prompt:
+        return JsonResponse({"error": "El prompt está vacío."}, status=400)
+
+    try:
+        system = "Eres un asistente breve y concreto. Responde en español."
+        resp = get_completion(prompt, system=system)
+
+        if not resp["ok"]:
+            return JsonResponse({"error": resp["error"]}, status=500)
+
+        return JsonResponse({"response": resp["text"]})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+# ------------------------------
+# Generar sugerencias de rutina con IA
+# ------------------------------
+@login_required
+def generate_routine_suggestions(request):
+    """
+    Llama a la IA con el contexto del usuario y guarda la sugerencia como AISuggestion.
+    """
+    try:
+        ctx = fetch_user_context(request.user)
+        prompt = build_prompt_for_routine(ctx)
+        resp = get_completion(prompt)
+
+        if not resp["ok"]:
+            messages.error(request, resp["error"])
+            return redirect("chat:home")
+
+        # Intentar obtener el JSON generado
+        data = resp["json"] or {}
+
+        sug = AISuggestion.objects.create(
+            user=request.user,
+            kind="routine",
+            payload=data or {"raw": resp["text"]},
+        )
+
+        messages.success(request, "Sugerencia generada correctamente.")
+        return redirect("chat:view_suggestion", suggestion_id=sug.id)
+
+    except Exception as e:
+        messages.error(request, f"Error al generar sugerencia: {e}")
+        return redirect("chat:home")
+
+
+# ------------------------------
+# Ver sugerencia generada por IA
+# ------------------------------
+@login_required
+def view_suggestion(request, suggestion_id: int):
+    sug = get_object_or_404(AISuggestion, id=suggestion_id, user=request.user)
+    return render(request, "chat/suggestion_detail.html", {"suggestion": sug})
+
+
+# ------------------------------
+# Aplicar sugerencia (crear RoutineSlots)
+# ------------------------------
+@login_required
+def apply_suggestion(request, suggestion_id: int):
+    """
+    Convierte la sugerencia en 'slots' de rutina editables (RoutineSlot).
+    """
+    if request.method != "POST":
+        return HttpResponseBadRequest("Método no permitido")
+
+    sug = get_object_or_404(AISuggestion, id=suggestion_id, user=request.user)
+    suggestions = sug.payload.get("suggestions", []) or sug.payload.get("slots", [])
+
+    count = 0
+    for s in suggestions:
+        day = s.get("day")
+        start = s.get("start")
+        end = s.get("end")
+        activity = s.get("activity", "Estudio")
+        notes = s.get("notes", "")
+
+        try:
+            start_t = datetime.strptime(start, "%H:%M").time()
+            end_t = datetime.strptime(end, "%H:%M").time()
+        except Exception:
+            continue
+
+        RoutineSlot.objects.create(
+            user=request.user,
+            day=day,
+            start=start_t,
+            end=end_t,
+            activity=activity,
+            notes=notes,
+            source="ai",
+        )
+        count += 1
+
+    sug.applied = True
+    sug.save(update_fields=["applied"])
+
+    messages.success(request, f"Se aplicaron {count} bloques a tu rutina.")
+    return redirect('routine')
+
+
+# ------------------------------
+# Ver los RoutineSlots aplicados
+# ------------------------------
+@login_required
+def list_routine_slots(request):
+    slots = RoutineSlot.objects.filter(user=request.user).order_by("day", "start")
+    return render(request, "chat/routine_slots.html", {"slots": slots})
+
+# ------------------------------
+# Chat inteligente que puede modificar la rutina
+# ------------------------------
+@login_required
+def ai_update_routine(request):
+    """
+    Endpoint que permite que la IA interprete órdenes del usuario como:
+    'Agrega gimnasio los martes de 7:00 a 8:00' o 'Elimina yoga del jueves'.
+    Si detecta una orden de agregar, crea un RoutineSlot.
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+    user_input = request.POST.get("prompt", "").strip()
+    if not user_input:
+        return JsonResponse({"error": "El prompt está vacío."}, status=400)
+
+    system_msg = (
+        "Eres un asistente que ayuda a gestionar rutinas de usuario. "
+        "Cuando el usuario diga 'agrega', 'programa' o 'añade', responde con JSON "
+        "en el formato {\"action\": \"add\", \"day\": \"Martes\", \"start\": \"07:00\", "
+        "\"end\": \"08:00\", \"activity\": \"Gimnasio\"}. "
+        "Si no puedes entender, responde con {\"action\": \"none\"}."
+    )
+
+    resp = get_completion(f"{system_msg}\n\nUsuario: {user_input}")
+
+    if not resp["ok"]:
+        return JsonResponse({"error": resp["error"]}, status=500)
+
+    data = resp["json"] or {}
+
+    if data.get("action") == "add":
+        try:
+            start_t = datetime.strptime(data["start"], "%H:%M").time()
+            end_t = datetime.strptime(data["end"], "%H:%M").time()
+
+            RoutineSlot.objects.create(
+                user=request.user,
+                day=data["day"],
+                start=start_t,
+                end=end_t,
+                activity=data["activity"],
+                notes="Agregado por IA",
+                source="ai",
+            )
+
+            return JsonResponse({"ok": True, "msg": "Actividad agregada a tu rutina."})
+
+        except Exception as e:
+            return JsonResponse({"error": f"No se pudo crear la actividad: {e}"}, status=400)
+
+    else:
+        return JsonResponse({
+            "ok": False,
+            "msg": "No se detectó una orden válida para modificar la rutina.",
+            "response": resp["text"],
+        })

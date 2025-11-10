@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Horario - EstudIAntes{% endblock %}
+
+{% block content %}
+<div class="section">
+  <h1 class="section-title">Editar Horario</h1>
+  <p class="text-muted mb-4">Modifica los detalles de tu clase u horario ocupado.</p>
+</div>
+
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+  <form method="post">
+    {% csrf_token %}
+    
+    <div class="form-group">
+      <label>Día de la semana</label>
+      {{ form.day }}
+    </div>
+
+    <div class="form-row form-row-2">
+      <div class="form-group">
+        <label>Hora de inicio</label>
+        {{ form.start_time }}
+      </div>
+      <div class="form-group">
+        <label>Hora de fin</label>
+        {{ form.end_time }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Materia o actividad</label>
+      {{ form.subject }}
+    </div>
+
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        {{ form.errors }}
+      </div>
+    {% endif %}
+
+    <div class="flex gap-3 flex-wrap mt-4">
+      <button type="submit" class="btn">Guardar Cambios</button>
+      <a href="{% url 'busyschedule:schedule_home' %}" class="btn btn-outline">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Horarios - EstudIAntes{% endblock %}
+
+{% block content %}
+<div class="section">
+  <h1 class="section-title">Mis Horarios</h1>
+  <p class="text-muted mb-4">Aquí puedes ver un resumen de tus clases y bloques disponibles.</p>
+</div>
+
+<div class="grid grid-2">
+  {% if classes %}
+    <div class="card">
+      <div class="card-header">Clases Registradas</div>
+      
+      <ul class="list">
+        {% for c in classes %}
+          <li class="list-item">
+            <div class="list-item-content">
+              <div style="font-weight: 600; margin-bottom: 4px;">{{ c.subject }}</div>
+              <div class="text-muted" style="font-size: 0.9rem;">
+                {{ c.day }} · {{ c.start_time|time:"H:i" }} - {{ c.end_time|time:"H:i" }}
+              </div>
+            </div>
+            <div class="list-item-actions">
+              <a class="btn btn-sm btn-outline" href="{% url 'busyschedule:edit_schedule' c.pk %}">Editar</a>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+      
+      <div class="mt-3">
+        <a href="{% url 'busyschedule:schedule_home' %}" class="btn">Agregar Nueva Clase</a>
+      </div>
+    </div>
+  {% else %}
+    <div class="card">
+      <div class="empty-state">
+        <p>Aún no tienes clases registradas.</p>
+        <a href="{% url 'busyschedule:schedule_home' %}" class="btn mt-3">Agregar Primera Clase</a>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-header">Bloques Disponibles</div>
+    
+    {% if blocks %}
+      <ul class="list">
+        {% for b in blocks %}
+          <li class="list-item">
+            <div class="list-item-content">
+              <div style="font-weight: 600; margin-bottom: 4px;">{{ b.day_of_week }}</div>
+              <div class="text-muted" style="font-size: 0.9rem;">
+                {{ b.start_time }}–{{ b.end_time }}
+              </div>
+            </div>
+            <a class="btn btn-sm btn-outline" href="{{ b.get_edit_url }}">Editar</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-state">
+        <p>No hay bloques disponibles registrados.</p>
+      </div>
+    {% endif %}
+    
+    <div class="mt-3">
+      <a href="{% url 'busyschedule:schedule_home' %}?new=block" class="btn btn-success">Agregar Bloque</a>
+    </div>
+  </div>
+</div>
+
+<div class="flex flex-wrap gap-3 mt-6">
+  <a href="/chat/" class="btn btn-outline">Chat con IA</a>
+  <a href="{% url 'chat:list_routine_slots' %}" class="btn">Ver Rutina Generada</a>
+</div>
+{% endblock %}

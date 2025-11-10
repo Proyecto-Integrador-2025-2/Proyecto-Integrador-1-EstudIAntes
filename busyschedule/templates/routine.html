@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Rutina Semanal - EstudIAntes{% endblock %}
+
+{% block content %}
+<div class="section">
+  <h1 class="section-title text-center">Mi Rutina Semanal</h1>
+  <p class="text-muted text-center mb-6">Tu rutina personalizada generada con inteligencia artificial</p>
+</div>
+
+<!-- Rutina -->
+{% if is_empty %}
+  <div class="card">
+    <div class="empty-state">
+      <div class="empty-state-icon"></div>
+      <h3 style="font-size: 1.25rem; margin-bottom: 12px;">Aún no tienes una rutina generada</h3>
+      <p class="text-muted mb-4">Usa nuestra IA para crear una rutina personalizada basada en tus horarios</p>
+      <a href="{% url 'chat:generate' %}" class="btn">Generar Rutina con IA</a>
+    </div>
+  </div>
+{% else %}
+  <div class="card">
+    <h2 class="card-title">Rutina Sugerida por IA</h2>
+    <div style="overflow-x: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th style="min-width: 120px;">Hora</th>
+            {% for day in days %}
+              <th style="min-width: 150px;">{{ day }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for hour in hours %}
+          <tr>
+            <td style="font-weight: 600; background: var(--primary-light);">
+              {{ hour }}:00 - {{ hour|add:"1" }}:00
+            </td>
+            {% for day in days %}
+              {% with slot=None %}
+                {% for rs in routine_slots %}
+                  {% if rs.day == day and rs.start.hour == hour %}
+                    {% with slot=rs %}{% endwith %}
+                  {% endif %}
+                {% endfor %}
+                {% if slot %}
+                  <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; text-align: center;">
+                    {{ slot.activity }}
+                  </td>
+                {% else %}
+                  <td style="background: #f8fafc;"></td>
+                {% endif %}
+              {% endwith %}
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 24px;">
+      <a href="{% url 'chat:generate' %}" class="btn">Regenerar Rutina</a>
+      <a href="{% url 'busyschedule:schedule_home' %}" class="btn btn-outline">Editar Horarios</a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}
