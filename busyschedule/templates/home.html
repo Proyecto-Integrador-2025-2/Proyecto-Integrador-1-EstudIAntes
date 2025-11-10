@@ -1,180 +1,170 @@
 {% extends "base.html" %}
 
-{% block title %}Mis horarios{% endblock %}
+{% block title %}Gestionar Horarios - EstudIAntes{% endblock %}
 
 {% block content %}
-<div class="row g-3">
-  <!-- Mensajes de éxito o error -->
-  {% if messages %}
-    <div class="col-12">
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
+<div class="section">
+  <h1 class="section-title">Gestionar Horarios</h1>
+  <p class="text-muted mb-4">Registra tus clases y bloques de tiempo disponibles para que la IA pueda sugerirte la mejor rutina de estudio.</p>
+</div>
 
-  <!-- Columna izquierda: formularios -->
-  <div class="col-md-5">
-    <!-- Formulario de horarios ocupados -->
-    <div class="card shadow-sm p-4 mb-4">
-      <h4 class="mb-3">Agregar horario ocupado</h4>
-      {% if form_schedule.errors %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          {{ form_schedule.errors }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-      {% endif %}
-      <form method="post" action="{% url 'busyschedule:schedule_home' %}" class="row g-2 align-items-end">
-        {% csrf_token %}
-        <div class="col-5">
-          <label class="form-label">Día</label>
+<div class="grid grid-2">
+  <div class="card">
+    <div class="card-header">Agregar Horario Ocupado</div>
+    
+    {% if form_schedule.errors %}
+      <div class="alert alert-danger">
+        <strong>Error:</strong> {{ form_schedule.errors }}
+      </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'busyschedule:schedule_home' %}">
+      {% csrf_token %}
+      
+      <div class="form-row form-row-3">
+        <div class="form-group">
+          <label>Día</label>
           {{ form_schedule.day }}
         </div>
-        <div class="col-3">
-          <label class="form-label">Inicio</label>
+        <div class="form-group">
+          <label>Hora inicio</label>
           {{ form_schedule.start_time }}
         </div>
-        <div class="col-3">
-          <label class="form-label">Fin</label>
+        <div class="form-group">
+          <label>Hora fin</label>
           {{ form_schedule.end_time }}
         </div>
-        <div class="col-12">
-          <label class="form-label">Materia / Motivo</label>
-          {{ form_schedule.subject }}
-        </div>
-        <div class="col-12">
-          <button type="submit" name="save_schedule" class="btn btn-primary w-100">Guardar</button>
-        </div>
-      </form>
-    </div>
+      </div>
 
-    <!-- Formulario de disponibilidad -->
-    <div class="card shadow-sm p-4 mb-4">
-      <h4 class="mb-3">Agregar disponibilidad</h4>
-      {% if form_block.errors %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          <strong>¡Atención!</strong> Corrige los siguientes errores:<br>
-          {{ form_block.errors }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-      {% endif %}
-      <form method="post" action="{% url 'busyschedule:schedule_home' %}" class="row g-2 align-items-end">
-        {% csrf_token %}
-        <div class="col-5">
-          <label class="form-label">Día</label>
+      <div class="form-group">
+        <label>Materia / Motivo</label>
+        {{ form_schedule.subject }}
+      </div>
+
+      <button type="submit" name="save_schedule" class="btn">Guardar Horario</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Agregar Disponibilidad</div>
+    
+    {% if form_block.errors %}
+      <div class="alert alert-danger">
+        <strong>Error:</strong> {{ form_block.errors }}
+      </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'busyschedule:schedule_home' %}">
+      {% csrf_token %}
+      
+      <div class="form-row form-row-3">
+        <div class="form-group">
+          <label>Día</label>
           {{ form_block.day }}
         </div>
-        <div class="col-3">
-          <label class="form-label">Inicio</label>
+        <div class="form-group">
+          <label>Hora inicio</label>
           {{ form_block.start_time }}
         </div>
-        <div class="col-3">
-          <label class="form-label">Fin</label>
+        <div class="form-group">
+          <label>Hora fin</label>
           {{ form_block.end_time }}
         </div>
-        <div class="col-12">
-          <button type="submit" name="save_block" class="btn btn-success w-100">Guardar disponibilidad</button>
-        </div>
-      </form>
-    </div>
-  </div> <!-- 🔹 Cierre de columna izquierda -->
-
-  <!-- Columna derecha: visualizaciones -->
-  <div class="col-md-7">
-
-    <!-- 🔹 Acciones de IA (punto E) -->
-    <div class="card shadow-sm mb-4">
-      <div class="card-body d-flex flex-wrap gap-2 align-items-center">
-        <h5 class="mb-0 me-2">Asistente IA</h5>
-        <a href="{% url 'chat:generate' %}" class="btn btn-success">
-          Pedir sugerencia de rutina (IA)
-        </a>
-        <a href="{% url 'chat:list_routine_slots' %}" class="btn btn-outline-primary">
-          Ver mi rutina
-        </a>
       </div>
+
+      <button type="submit" name="save_block" class="btn btn-success">Guardar Disponibilidad</button>
+    </form>
+  </div>
+</div>
+
+<div class="card mt-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+  <div class="flex flex-wrap gap-3 items-center">
+    <div style="flex: 1; min-width: 200px;">
+      <h3 style="margin: 0; font-size: 1.25rem;">Asistente Inteligente</h3>
+      <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 0.95rem;">Genera tu rutina personalizada con IA</p>
     </div>
-    <!-- 🔹 Fin Acciones de IA -->
-
-    <!-- Horarios ocupados -->
-    <h4 class="mb-3">Horarios ocupados</h4>
-    <div class="card shadow-sm mb-4">
-      <ul class="list-group list-group-flush">
-        {% for s in schedules %}
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <span>
-              <strong>{{ s.subject }}</strong><br>
-              {{ s.day }}: {{ s.start_time }} - {{ s.end_time }}
-            </span>
-            <div>
-              <form method="post" action="{% url 'busyschedule:delete_schedule' s.pk %}" class="d-inline"
-                    onsubmit="return confirm('¿Eliminar este horario?');">
-                {% csrf_token %}
-                <button class="btn btn-sm btn-danger" type="submit">Eliminar</button>
-              </form>
-              <button class="btn btn-sm btn-success me-2"
-                      data-bs-toggle="modal"
-                      data-bs-target="#editModal"
-                      data-schedule-id="{{ s.pk }}"
-                      data-edit-url="{% url 'busyschedule:edit_schedule_modal' s.pk %}">
-                Editar
-              </button>
-            </div>
-          </li>
-        {% empty %}
-          <li class="list-group-item text-muted">No tienes horarios registrados.</li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <!-- Bloques disponibles -->
-    <h4 class="mb-3">Bloques disponibles</h4>
-    <div class="card shadow-sm p-3">
-      {% if blocks_by_day %}
-        {% for day, day_blocks in blocks_by_day.items %}
-          <div class="mb-3 border rounded p-2">
-            <h6 class="fw-bold">{{ day }}</h6>
-            <ul class="list-group list-group-flush">
-              {% for b in day_blocks %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span>{{ b.start_time }} - {{ b.end_time }}</span>
-                  <form method="post" action="{% url 'busyschedule:delete_block' b.pk %}" class="d-inline"
-                        onsubmit="return confirm('¿Eliminar este bloque disponible?');">
-                    {% csrf_token %}
-                    <button class="btn btn-sm btn-danger" type="submit">Eliminar</button>
-                  </form>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        {% endfor %}
-      {% else %}
-        <p class="text-muted">Sin bloques disponibles</p>
-      {% endif %}
-    </div>
-  </div> <!-- 🔹 Cierre de columna derecha -->
-
-  <!-- Modales (Edit y Delete) -->
-  <div id="modalContainer"></div>
-</div> <!-- 🔹 Cierre de row -->
-
-<!-- 🔹 Toasts para mensajes AJAX -->
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-  <div id="toastMessage" class="toast align-items-center text-bg-info border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body" id="toastBody">Mensaje</div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    <div class="flex flex-wrap gap-2">
+      <a href="{% url 'chat:generate' %}" class="btn" style="background: white; color: #667eea;">
+        Pedir Sugerencia de Rutina
+      </a>
+      <a href="{% url 'chat:list_routine_slots' %}" class="btn btn-outline" style="border-color: white; color: white;">
+        Ver Mi Rutina Actual
+      </a>
     </div>
   </div>
 </div>
+
+<div class="section mt-6">
+  <h2 class="section-title">Horarios Ocupados</h2>
+  
+  {% if schedules %}
+    <ul class="list">
+      {% for s in schedules %}
+        <li class="list-item">
+          <div class="list-item-content">
+            <div style="font-weight: 600; font-size: 1.05rem; margin-bottom: 4px;">{{ s.subject }}</div>
+            <div class="text-muted" style="font-size: 0.9rem;">
+              {{ s.day }} · {{ s.start_time }} - {{ s.end_time }}
+            </div>
+          </div>
+          <div class="list-item-actions">
+            <form method="post" action="{% url 'busyschedule:delete_schedule' s.pk %}" class="d-inline"
+                  onsubmit="return confirm('¿Seguro que deseas eliminar este horario?');">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-danger" type="submit">Eliminar</button>
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"></div>
+      <p>No tienes horarios ocupados registrados.</p>
+      <p class="text-muted">Agrega tu primer horario usando el formulario de arriba.</p>
+    </div>
+  {% endif %}
+</div>
+
+<div class="section mt-6">
+  <h2 class="section-title">Bloques Disponibles</h2>
+  
+  {% if blocks_by_day %}
+    <div class="grid grid-3">
+      {% for day, day_blocks in blocks_by_day.items %}
+        <div class="card">
+          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; color: var(--primary);">
+            {{ day }}
+          </h3>
+          <ul class="list">
+            {% for b in day_blocks %}
+              <li class="list-item" style="margin-bottom: 8px; padding: 12px;">
+                <span style="font-weight: 600;">{{ b.start_time }} - {{ b.end_time }}</span>
+                <form method="post" action="{% url 'busyschedule:delete_block' b.pk %}" class="d-inline"
+                      onsubmit="return confirm('¿Eliminar este bloque?');">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-danger" type="submit">Eliminar</button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"></div>
+      <p>No tienes bloques disponibles registrados.</p>
+      <p class="text-muted">Agrega tus bloques de tiempo libre usando el formulario de arriba.</p>
+    </div>
+  {% endif %}
+</div>
+
+<div id="modalContainer"></div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-  // Helper para inyectar modal HTML y abrir modal con Bootstrap
   function openModalFromHtml(html) {
     const container = document.getElementById('modalContainer')
     container.innerHTML = html
@@ -184,7 +174,6 @@
     return { modalEl, modal }
   }
 
-  // Handler dinámico para editar
   document.querySelectorAll('[data-edit-url]').forEach(btn => {
     btn.addEventListener('click', function (e) {
       e.preventDefault()
@@ -193,7 +182,6 @@
         .then(r => r.json())
         .then(data => {
           const { modalEl, modal } = openModalFromHtml(data.html_form)
-          // bind save inside modal
           const saveBtn = modalEl.querySelector('#saveEdit')
           if (saveBtn) {
             saveBtn.addEventListener('click', function () {
@@ -207,7 +195,6 @@
                     modal.hide()
                     location.reload()
                   } else {
-                    // Reemplazar cuerpo con errores
                     modalEl.querySelector('.modal-body').innerHTML = resp.html_form
                   }
                 })
@@ -217,7 +204,6 @@
     })
   })
 
-  // Handler dinámico para eliminar (horarios y bloques)
   document.querySelectorAll('[data-delete-url]').forEach(btn => {
     btn.addEventListener('click', function (e) {
       e.preventDefault()

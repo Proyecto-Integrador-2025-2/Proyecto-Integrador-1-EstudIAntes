@@ -1,15 +1,46 @@
 {% extends "base.html" %}
 
-{% block title %}Bienvenido - estudIAntes{% endblock %}
+{% block title %}Bienvenido - EstudIAntes{% endblock %}
 
 {% block content %}
-<div class="text-center py-5">
-  <h1 class="fw-bold mb-4">Bienvenido a estudIAntes</h1>
-  <p class="lead mb-5">Organiza tus horarios, gestiona tu disponibilidad y simplifica tu estudio.</p>
 
-  <div class="d-flex justify-content-center gap-3 flex-wrap">
-  <a href="{% url 'busyschedule:schedule_home' %}" class="btn btn-primary btn-lg px-4">Agregar Horarios</a>
-  <a href="{% url 'routine' %}" class="btn btn-outline-light btn-lg px-4">Ver rutina</a>
+<div class="text-center py-5">
+  <div style="font-size: 4rem; margin-bottom: 24px;"></div>
+  <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+    EstudIAntes
+  </h1>
+  <p class="text-lg text-muted mb-6" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+    Tu asistente inteligente para organizar horarios, gestionar tu tiempo disponible y optimizar tu rutina de estudio con IA.
+  </p>
+
+  <div class="flex flex-wrap gap-3 justify-center mb-6">
+    <a href="{% url 'busyschedule:schedule_home' %}" class="btn" style="padding: 16px 32px; font-size: 1.1rem;">
+      + Comenzar a Agregar Horarios
+    </a>
+    <a href="{% url 'routine' %}" class="btn btn-outline" style="padding: 16px 32px; font-size: 1.1rem;">
+       Ver Mi Rutina
+    </a>
+  </div>
+</div>
+
+<!-- Secciones -->
+<div class="grid grid-3 mt-6">
+  <div class="card text-center">
+    <div style="font-size: 3rem; margin-bottom: 16px;">/\</div>
+    <h3 class="font-semibold mb-2">Gestiona Horarios</h3>
+    <p class="text-muted">Registra tus clases y bloques de tiempo disponible de forma sencilla</p>
+  </div>
+
+  <div class="card text-center">
+    <div style="font-size: 3rem; margin-bottom: 16px;"></div>
+    <h3 class="font-semibold mb-2">IA Inteligente</h3>
+    <p class="text-muted">Genera rutinas personalizadas con nuestra inteligencia artificial</p>
+  </div>
+
+  <div class="card text-center">
+    <div style="font-size: 3rem; margin-bottom: 16px;"></div>
+    <h3 class="font-semibold mb-2">Visualiza Todo</h3>
+    <p class="text-muted">Calendario semanal y vista detallada de todas tus actividades</p>
   </div>
 </div>
 {% endblock %}
