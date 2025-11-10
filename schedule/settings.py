@@ -36,7 +36,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     "testserver",
-    "13.222.177.100",
+    "54.156.235.42",
 ]
 
 # Si usas túneles o dominios externos en dev, añádelos por env:
