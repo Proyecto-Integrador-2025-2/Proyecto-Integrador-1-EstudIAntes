@@ -12,5 +12,7 @@ urlpatterns = [
     path('suggestion/<int:suggestion_id>/', views.view_suggestion, name='view_suggestion'),
     path('suggestion/<int:suggestion_id>/apply/', views.apply_suggestion, name='apply_suggestion'),
     path('routine/', views.list_routine_slots, name='list_routine_slots'),
+    path('routine/delete/<int:slot_id>/', views.delete_routine_slot, name='delete_routine_slot'),
+    path('routine/delete-all/', views.delete_all_routine_slots, name='delete_all_routine_slots'),
 ]
 

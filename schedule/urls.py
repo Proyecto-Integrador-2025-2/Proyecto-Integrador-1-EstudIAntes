@@ -21,7 +21,8 @@ from busyschedule.views import main_home, routine_view
 urlpatterns = [
     path('', main_home, name='home'),
     path('horarios/', include(('busyschedule.urls', 'busyschedule'), namespace='busyschedule')),
-    path('rutina/', routine_view, name='routine'),
+    # Redirigir /rutina/ a la vista de chat/routine para mantener compatibilidad
+    # path('rutina/', routine_view, name='routine'),  # Comentado, ahora se usa chat:list_routine_slots
     path('contenido/', include(('content.urls', 'content'), namespace='content')),
     path('chat/', include(('chat.urls', 'chat'), namespace='chat')),
     path('accounts/', include('django.contrib.auth.urls')),

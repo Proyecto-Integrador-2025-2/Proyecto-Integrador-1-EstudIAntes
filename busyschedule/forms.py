@@ -13,6 +13,10 @@ class ClassScheduleForm(forms.ModelForm):
             'subject': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
     def clean(self):
         cleaned_data = super().clean()
         day = cleaned_data.get("day")
@@ -23,12 +27,16 @@ class ClassScheduleForm(forms.ModelForm):
             raise forms.ValidationError("La hora de inicio debe ser antes que la hora de fin.")
 
         if day and start_time and end_time:
-            # Buscar traslape con otros horarios ocupados
+            # Buscar traslape con otros horarios ocupados DEL MISMO USUARIO
             overlaps = ClassSchedule.objects.filter(
                 day=day,
                 start_time__lt=end_time,   # empieza antes de que termine este
                 end_time__gt=start_time    # termina después de que empiece este
             )
+            
+            # Filtrar por usuario si está disponible
+            if self.user:
+                overlaps = overlaps.filter(user=self.user)
 
             # Excluirse a sí mismo si está editando
             if self.instance and self.instance.pk:
@@ -54,6 +62,10 @@ class AvailableBlockForm(forms.ModelForm):
             'end_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control form-control-sm'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
     def clean(self):
         cleaned_data = super().clean()
         day = cleaned_data.get("day")
@@ -64,12 +76,16 @@ class AvailableBlockForm(forms.ModelForm):
             raise forms.ValidationError("La hora de inicio debe ser antes que la hora de fin.")
 
         if day and start_time and end_time:
-            # Buscar traslape con horarios ocupados
+            # Buscar traslape con horarios ocupados DEL MISMO USUARIO
             overlaps = ClassSchedule.objects.filter(
                 day=day,
                 start_time__lt=end_time,
                 end_time__gt=start_time
             )
+            
+            # Filtrar por usuario si está disponible
+            if self.user:
+                overlaps = overlaps.filter(user=self.user)
 
             if self.instance and self.instance.pk:
                 overlaps = overlaps.exclude(pk=self.instance.pk)

@@ -6,10 +6,9 @@ from busyschedule.models import ClassSchedule, AvailableBlock
 DAYS_ES = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"]
 
 def fetch_user_context(user: User) -> Dict:
-    # Ajusta si los modelos tienen relación con usuario (user=ForeignKey). 
-    # Si aún no, filtra global o adapta cuando agreguen multiusuario.
-    schedules = ClassSchedule.objects.all().order_by("day", "start_time")
-    blocks = AvailableBlock.objects.all().order_by("day", "start_time")
+    # Filtrar por usuario para obtener contexto personalizado
+    schedules = ClassSchedule.objects.filter(user=user).order_by("day", "start_time")
+    blocks = AvailableBlock.objects.filter(user=user).order_by("day", "start_time")
 
     def fmt_slot(s):
         return {

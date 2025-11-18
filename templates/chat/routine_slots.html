@@ -6,6 +6,15 @@
 <div class="section">
   <h1 class="section-title">Mi Rutina Detallada</h1>
   <p class="text-muted mb-4">Vista completa de todas tus actividades planificadas</p>
+  
+  {% if slots %}
+    <form method="POST" action="{% url 'chat:delete_all_routine_slots' %}" style="display: inline;" onsubmit="return confirm('¿Estás seguro de eliminar TODAS las actividades de tu rutina?');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline" style="background-color: #dc3545; color: white; border-color: #dc3545;">
+        🗑️ Eliminar Toda la Rutina
+      </button>
+    </form>
+  {% endif %}
 </div>
 
 <div class="card">
@@ -20,6 +29,7 @@
             <th>Actividad</th>
             <th>Notas</th>
             <th>Fuente</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -32,6 +42,14 @@
             <td class="text-muted">{{ r.notes|default:"—" }}</td>
             <td>
               <span class="tag">{{ r.source }}</span>
+            </td>
+            <td>
+              <form method="POST" action="{% url 'chat:delete_routine_slot' r.id %}" style="display: inline;" onsubmit="return confirm('¿Eliminar esta actividad?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.875rem; background-color: #dc3545; color: white; border-color: #dc3545;">
+                  Eliminar
+                </button>
+              </form>
             </td>
           </tr>
         {% endfor %}
@@ -49,7 +67,7 @@
 </div>
 
 <div class="flex flex-wrap gap-3 mt-4">
-  <a href="{% url 'routine' %}" class="btn btn-outline">Ver Vista Semanal</a>
+  <a href="{% url 'chat:list_routine_slots' %}" class="btn btn-outline">Ver Vista Semanal</a>
   <a href="{% url 'busyschedule:schedule_home' %}" class="btn btn-outline">Editar Horarios</a>
 </div>
 {% endblock %}

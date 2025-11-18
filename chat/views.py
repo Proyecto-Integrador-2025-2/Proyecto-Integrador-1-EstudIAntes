@@ -130,7 +130,7 @@ def apply_suggestion(request, suggestion_id: int):
     sug.save(update_fields=["applied"])
 
     messages.success(request, f"Se aplicaron {count} bloques a tu rutina.")
-    return redirect('routine')
+    return redirect('chat:list_routine_slots')
 
 
 # ------------------------------
@@ -140,6 +140,35 @@ def apply_suggestion(request, suggestion_id: int):
 def list_routine_slots(request):
     slots = RoutineSlot.objects.filter(user=request.user).order_by("day", "start")
     return render(request, "chat/routine_slots.html", {"slots": slots})
+
+
+# ------------------------------
+# Eliminar un RoutineSlot individual
+# ------------------------------
+@login_required
+def delete_routine_slot(request, slot_id):
+    """Elimina un RoutineSlot específico del usuario."""
+    if request.method == "POST":
+        slot = get_object_or_404(RoutineSlot, id=slot_id, user=request.user)
+        slot.delete()
+        messages.success(request, "Actividad eliminada de tu rutina.")
+        return redirect('chat:list_routine_slots')
+    return redirect('chat:list_routine_slots')
+
+
+# ------------------------------
+# Eliminar TODAS las rutinas del usuario
+# ------------------------------
+@login_required
+def delete_all_routine_slots(request):
+    """Elimina todas las rutinas del usuario actual."""
+    if request.method == "POST":
+        count = RoutineSlot.objects.filter(user=request.user).count()
+        RoutineSlot.objects.filter(user=request.user).delete()
+        messages.success(request, f"Se eliminaron {count} actividad(es) de tu rutina.")
+        return redirect('chat:list_routine_slots')
+    return redirect('chat:list_routine_slots')
+
 
 # ------------------------------
 # Chat inteligente que puede modificar la rutina
